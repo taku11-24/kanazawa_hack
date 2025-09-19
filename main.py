@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse ,JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 import shutil
@@ -24,6 +24,11 @@ async def upload_file(file: UploadFile = File(...)):
     with file_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     return "File uploaded: " + file.filename
+
+@app.get("/uploads", response_class=JSONResponse)
+def list_uploaded_files():
+    files = [f.name for f in UPLOAD_DIR.iterdir() if f.is_file()]
+    return {"files": files}
 
 @app.get("/")
 def root():
